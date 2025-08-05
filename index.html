@@ -60,15 +60,20 @@
             transition: opacity 1s ease-out;
         }
 
-        .loading-text {
-            font-family: 'Orbitron', monospace;
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 15px #ffd700, 0 0 25px #ffd700;
-            margin-bottom: 2rem;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
+      .loading-text {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 0 15px #ffd700, 0 0 25px #ffd700;
+    margin-bottom: 2rem;
+    animation: glow 2s ease-in-out infinite alternate;
+    font-size: 6vw; /* scales with screen width */
+}
+        @media screen and (max-width: 480px) {
+    .loading-text {
+        font-size: 8vw;
+    }
+}
 
         .loading-bar {
             width: 300px;
@@ -375,7 +380,7 @@
                         <option value="substitution">Substitution Cipher</option>
                         <option value="reverse">Reverse Alphabet Shift</option>
                         <option value="playfair">Playfair Cipher</option>
-                        <option value="morse">Morse Code (Enhanced)</option>
+                        <option value="morse">Morse Code</option>
                         <option value="hex">Hexadecimal</option>
                         <option value="rot13">ROT13</option>
                         <option value="railfence">Rail Fence Cipher</option>
@@ -964,4 +969,5 @@
 </body>
 
 </html>
+
 
