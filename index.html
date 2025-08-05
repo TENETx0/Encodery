@@ -937,6 +937,10 @@
                 document.execCommand('copy');
             }
         });
+          document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+  }, false);
+        
     </script>
     <footer style="text-align:center; padding: 1rem 0; color:#ffffff; background:#0d1117; border-top: 1px solid #39ff14; margin-top: 2rem; font-family: 'Share Tech Mono', monospace;">
     <p style="margin: 0.3rem;">Made with 💻 by <strong>Monish Kanna S P</strong></p>
@@ -947,4 +951,5 @@
     </p>
 </footer>
 </body>
+
 </html>
