@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encodery - Hacker Encryption Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            color: #39ff14;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Matrix Background Effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000 0%, #0d1117 30%, #161b22 70%, #000000 100%);
+            z-index: -2;
+        }
+
+        .matrix-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(57, 255, 20, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(0, 191, 255, 0.03) 0%, transparent 50%);
+            animation: pulse 6s ease-in-out infinite alternate;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1s ease-out;
+        }
+
+        .loading-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 15px #ffd700, 0 0 25px #ffd700;
+            margin-bottom: 2rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #39ff14;
+        }
+
+        .loading-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #39ff14, #00bfff);
+            border-radius: 2px;
+            animation: loading 3s ease-in-out forwards;
+            box-shadow: 0 0 8px #39ff14;
+        }
+
+        .hack-text {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #ffffff;
+            opacity: 0.7;
+            animation: typewriter 2s steps(20) infinite;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        .container.loaded {
+            opacity: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .main-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700;
+            margin-bottom: 0.5rem;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ffffff;
+            opacity: 0.8;
+        }
+
+        /* Crypto Box */
+        .crypto-box {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(13, 17, 23, 0.8));
+            border: 2px solid #39ff14;
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 
+                0 0 20px rgba(57, 255, 20, 0.2),
+                inset 0 0 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .crypto-box::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #39ff14, #00bfff, #ffd700, #39ff14);
+            border-radius: 15px;
+            z-index: -1;
+            animation: borderGlow 4s linear infinite;
+            opacity: 0.3;
+        }
+
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #00bfff;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select, input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #39ff14;
+            border-radius: 8px;
+            padding: 0.8rem;
+            color: #ffffff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #00bfff;
+            box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+        }
+
+        select option {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #39ff14, #00bfff);
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1.5rem;
+            color: #000000;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(57, 255, 20, 0.3);
+            background: linear-gradient(45deg, #ffd700, #00bfff);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Text Areas */
+        .text-areas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .text-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .text-group h3 {
+            font-family: 'Orbitron', monospace;
+            color: #ffd700;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px #ffd700;
+        }
+
+        textarea {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #39ff14;
+            border-radius: 10px;
+            padding: 1rem;
+            color: #ffffff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
+            min-height: 200px;
+            resize: vertical;
+            transition: all 0.3s ease;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00bfff;
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.2);
+        }
+
+        /* Animations */
+        @keyframes glow {
+            from { text-shadow: 0 0 15px #ffd700; }
+            to { text-shadow: 0 0 25px #ffd700, 0 0 35px #ffd700; }
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.2; }
+            to { opacity: 0.4; }
+        }
+
+        @keyframes loading {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        @keyframes typewriter {
+            0%, 50% { opacity: 0.8; }
+            51%, 100% { opacity: 0.4; }
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Processing Animation */
+        .process-indicator {
+            display: none;
+            text-align: center;
+            color: #00bfff;
+            font-size: 1rem;
+            margin: 1rem 0;
+            animation: typewriter 1s infinite;
+        }
+
+        .process-indicator.active {
+            display: block;
+        }
+
+        /* Key Input (initially hidden) */
+        .key-input {
+            display: none;
+        }
+
+        .key-input.show {
+            display: flex;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .text-areas {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Background -->
+    <div class="matrix-bg"></div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">TENETx0's Encodery</div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+        <div class="hack-text">Initializing encryption modules...</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1 class="main-title">Encodery</h1>
+            <p class="subtitle">Advanced Encryption & Decryption Terminal</p>
+        </div>
+
+        <div class="crypto-box">
+            <div class="controls">
+                <div class="form-group">
+                    <label for="algorithm">Select Algorithm</label>
+                    <select id="algorithm">
+                        <option value="atbash">Atbash Cipher</option>
+                        <option value="base64">Base64 Encoding/Decoding</option>
+                        <option value="caesar">Caesar Cipher</option>
+                        <option value="vigenere">Vigenère Cipher</option>
+                        <option value="substitution">Substitution Cipher</option>
+                        <option value="reverse">Reverse Alphabet Shift</option>
+                        <option value="playfair">Playfair Cipher</option>
+                        <option value="morse">Morse Code (Enhanced)</option>
+                        <option value="hex">Hexadecimal</option>
+                        <option value="rot13">ROT13</option>
+                        <option value="railfence">Rail Fence Cipher</option>
+                        <option value="jsfuck">JSFuck Cipher</option>
+                        <option value="xor">XOR Custom Key</option>
+                    </select>
+                </div>
+
+                <div class="form-group key-input" id="keyInput">
+                    <label for="customKey">Key/Shift</label>
+                    <input type="text" id="customKey" placeholder="Enter key or shift value">
+                </div>
+
+                <button class="btn" onclick="processText('encrypt')">ENCRYPT</button>
+                <button class="btn" onclick="processText('decrypt')">DECRYPT</button>
+            </div>
+
+            <div class="process-indicator" id="processIndicator">
+                >>> PROCESSING DATA...
+            </div>
+
+            <div class="text-areas">
+                <div class="text-group">
+                    <h3>Input Data</h3>
+                    <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+                </div>
+                <div class="text-group">
+                    <h3>Output Data</h3>
+                    <textarea id="outputText" placeholder="Result will appear here..." readonly></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Loading screen
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('mainContainer').classList.add('loaded');
+                }, 1000);
+            }, 3000);
+        });
+
+        // Show/hide key input based on algorithm
+        document.getElementById('algorithm').addEventListener('change', function() {
+            const keyInput = document.getElementById('keyInput');
+            const keyField = document.getElementById('customKey');
+            const algorithm = this.value;
+            
+            if (['caesar', 'xor', 'railfence', 'vigenere', 'substitution', 'reverse', 'playfair'].includes(algorithm)) {
+                keyInput.classList.add('show');
+                switch(algorithm) {
+                    case 'caesar':
+                        keyField.placeholder = 'Enter shift value (1-25)';
+                        break;
+                    case 'xor':
+                        keyField.placeholder = 'Enter XOR key';
+                        break;
+                    case 'railfence':
+                        keyField.placeholder = 'Enter number of rails (2-10)';
+                        break;
+                    case 'vigenere':
+                        keyField.placeholder = 'Enter keyword (letters only)';
+                        break;
+                    case 'substitution':
+                        keyField.placeholder = 'Enter 26-letter substitution key';
+                        break;
+                    case 'reverse':
+                        keyField.placeholder = 'Enter shift value (1-25)';
+                        break;
+                    case 'playfair':
+                        keyField.placeholder = 'Enter keyword for 5x5 grid';
+                        break;
+                }
+                keyField.required = true;
+            } else {
+                keyInput.classList.remove('show');
+                keyField.required = false;
+            }
+        });
+
+        // Encryption/Decryption functions
+        function atbashCipher(text) {
+            return text.split('').map(function(char) {
+                if (char >= 'A' && char <= 'Z') {
+                    return String.fromCharCode('Z'.charCodeAt(0) - (char.charCodeAt(0) - 'A'.charCodeAt(0)));
+                } else if (char >= 'a' && char <= 'z') {
+                    return String.fromCharCode('z'.charCodeAt(0) - (char.charCodeAt(0) - 'a'.charCodeAt(0)));
+                }
+                return char;
+            }).join('');
+        }
+
+        function caesarCipher(text, shift, decrypt) {
+            if (decrypt) shift = -shift;
+            return text.split('').map(function(char) {
+                if (char >= 'A' && char <= 'Z') {
+                    return String.fromCharCode(((char.charCodeAt(0) - 65 + shift + 26) % 26) + 65);
+                } else if (char >= 'a' && char <= 'z') {
+                    return String.fromCharCode(((char.charCodeAt(0) - 97 + shift + 26) % 26) + 97);
+                }
+                return char;
+            }).join('');
+        }
+
+        function toMorse(text) {
+            const morseCode = {
+                'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+                'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+                'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+                'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+                'Y': '-.--', 'Z': '--..', '0': '-----', '1': '.----', '2': '..---',
+                '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...',
+                '8': '---..', '9': '----.', ' ': '/', '.': '.-.-.-', ',': '--..--',
+                '?': '..--..', "'": '.----.', '!': '-.-.--', '/': '-..-.', '(': '-.--.',
+                ')': '-.--.-', '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-',
+                '+': '.-.-.', '-': '-....-', '_': '..--.-', '"': '.-..-.', '$': '...-..-',
+                '@': '.--.-.'
+            };
+            return text.toUpperCase().split('').map(function(char) {
+                return morseCode[char] || char;
+            }).join(' ');
+        }
+
+        function fromMorse(text) {
+            const morseCode = {
+                '.-': 'A', '-...': 'B', '-.-.': 'C', '-..': 'D', '.': 'E', '..-.': 'F',
+                '--.': 'G', '....': 'H', '..': 'I', '.---': 'J', '-.-': 'K', '.-..': 'L',
+                '--': 'M', '-.': 'N', '---': 'O', '.--.': 'P', '--.-': 'Q', '.-.': 'R',
+                '...': 'S', '-': 'T', '..-': 'U', '...-': 'V', '.--': 'W', '-..-': 'X',
+                '-.--': 'Y', '--..': 'Z', '-----': '0', '.----': '1', '..---': '2',
+                '...--': '3', '....-': '4', '.....': '5', '-....': '6', '--...': '7',
+                '---..': '8', '----.': '9', '/': ' ', '.-.-.-': '.', '--..--': ',',
+                '..--..': '?', '.----.': "'", '-.-.--': '!', '-..-.': '/', '-.--.-': ')',
+                '-.---.': '(', '.-...': '&', '---...': ':', '-.-.-.': ';', '-...-': '=',
+                '.-.-.': '+', '-....-': '-', '..--.-': '_', '.-..-.': '"', '...-..-': '$',
+                '.--.-': '@'
+            };
+            return text.split(' ').map(function(code) {
+                return morseCode[code] || code;
+            }).join('');
+        }
+
+        function vigenereEncode(text, key, decrypt) {
+            const keyUpper = key.toUpperCase().replace(/[^A-Z]/g, '');
+            if (!keyUpper) throw new Error('Vigenère key must contain letters!');
+            
+            return text.split('').map(function(char, i) {
+                if (char >= 'A' && char <= 'Z') {
+                    const shift = keyUpper.charCodeAt(i % keyUpper.length) - 65;
+                    const charPos = char.charCodeAt(0) - 65;
+                    const newPos = decrypt ? (charPos - shift + 26) % 26 : (charPos + shift) % 26;
+                    return String.fromCharCode(newPos + 65);
+                } else if (char >= 'a' && char <= 'z') {
+                    const shift = keyUpper.charCodeAt(i % keyUpper.length) - 65;
+                    const charPos = char.charCodeAt(0) - 97;
+                    const newPos = decrypt ? (charPos - shift + 26) % 26 : (charPos + shift) % 26;
+                    return String.fromCharCode(newPos + 97);
+                }
+                return char;
+            }).join('');
+        }
+
+        function substitutionCipher(text, key, decrypt) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const keyUpper = key.toUpperCase().replace(/[^A-Z]/g, '');
+            
+            if (keyUpper.length !== 26) {
+                throw new Error('Substitution key must be exactly 26 letters!');
+            }
+            
+            const unique = [];
+            for (let i = 0; i < keyUpper.length; i++) {
+                if (unique.indexOf(keyUpper[i]) === -1) {
+                    unique.push(keyUpper[i]);
+                }
+            }
+            if (unique.length !== 26) {
+                throw new Error('Substitution key must contain each letter exactly once!');
+            }
+            
+            return text.split('').map(function(char) {
+                if (char >= 'A' && char <= 'Z') {
+                    const index = decrypt ? keyUpper.indexOf(char) : alphabet.indexOf(char);
+                    return decrypt ? alphabet[index] : keyUpper[index];
+                } else if (char >= 'a' && char <= 'z') {
+                    const index = decrypt ? keyUpper.indexOf(char.toUpperCase()) : alphabet.indexOf(char.toUpperCase());
+                    const result = decrypt ? alphabet[index] : keyUpper[index];
+                    return result.toLowerCase();
+                }
+                return char;
+            }).join('');
+        }
+
+        function reverseAlphabetShift(text, shift, decrypt) {
+            const actualShift = decrypt ? -shift : shift;
+            return text.split('').map(function(char) {
+                if (char >= 'A' && char <= 'Z') {
+                    // First apply Caesar shift, then reverse alphabet
+                    let shiftedChar;
+                    if (decrypt) {
+                        // For decryption: reverse alphabet first, then apply negative shift
+                        const reversed = String.fromCharCode('Z'.charCodeAt(0) - (char.charCodeAt(0) - 'A'.charCodeAt(0)));
+                        const shiftedPos = (reversed.charCodeAt(0) - 65 - shift + 26) % 26;
+                        shiftedChar = String.fromCharCode(shiftedPos + 65);
+                    } else {
+                        // For encryption: apply shift first, then reverse alphabet
+                        const shiftedPos = (char.charCodeAt(0) - 65 + shift) % 26;
+                        const shiftedLetter = String.fromCharCode(shiftedPos + 65);
+                        shiftedChar = String.fromCharCode('Z'.charCodeAt(0) - (shiftedLetter.charCodeAt(0) - 'A'.charCodeAt(0)));
+                    }
+                    return shiftedChar;
+                } else if (char >= 'a' && char <= 'z') {
+                    let shiftedChar;
+                    if (decrypt) {
+                        // For decryption: reverse alphabet first, then apply negative shift
+                        const reversed = String.fromCharCode('z'.charCodeAt(0) - (char.charCodeAt(0) - 'a'.charCodeAt(0)));
+                        const shiftedPos = (reversed.charCodeAt(0) - 97 - shift + 26) % 26;
+                        shiftedChar = String.fromCharCode(shiftedPos + 97);
+                    } else {
+                        // For encryption: apply shift first, then reverse alphabet
+                        const shiftedPos = (char.charCodeAt(0) - 97 + shift) % 26;
+                        const shiftedLetter = String.fromCharCode(shiftedPos + 97);
+                        shiftedChar = String.fromCharCode('z'.charCodeAt(0) - (shiftedLetter.charCodeAt(0) - 'a'.charCodeAt(0)));
+                    }
+                    return shiftedChar;
+                }
+                return char;
+            }).join('');
+        }
+
+        function playfairCipher(text, key, decrypt) {
+            const alphabet = 'ABCDEFGHIKLMNOPQRSTUVWXYZ';
+            const keyUpper = key.toUpperCase().replace(/[^A-Z]/g, '').replace(/J/g, 'I');
+            const used = {};
+            let grid = [];
+            
+            for (let i = 0; i < keyUpper.length; i++) {
+                const char = keyUpper[i];
+                if (!used[char]) {
+                    grid.push(char);
+                    used[char] = true;
+                }
+            }
+            
+            for (let i = 0; i < alphabet.length; i++) {
+                const char = alphabet[i];
+                if (!used[char]) {
+                    grid.push(char);
+                }
+            }
+            
+            const matrix = [];
+            for (let i = 0; i < 5; i++) {
+                matrix[i] = grid.slice(i * 5, (i + 1) * 5);
+            }
+            
+            function findPos(char) {
+                for (let i = 0; i < 5; i++) {
+                    for (let j = 0; j < 5; j++) {
+                        if (matrix[i][j] === char) return [i, j];
+                    }
+                }
+                return [-1, -1];
+            }
+            
+            if (decrypt) {
+                // For decryption, we need to process the cipher text differently
+                text = text.toUpperCase().replace(/[^A-Z]/g, '');
+                let pairs = [];
+                
+                for (let i = 0; i < text.length; i += 2) {
+                    if (i + 1 < text.length) {
+                        pairs.push(text[i] + text[i + 1]);
+                    }
+                }
+                
+                let result = pairs.map(function(pair) {
+                    const pos1 = findPos(pair[0]);
+                    const pos2 = findPos(pair[1]);
+                    const row1 = pos1[0], col1 = pos1[1];
+                    const row2 = pos2[0], col2 = pos2[1];
+                    
+                    if (row1 === row2) {
+                        const newCol1 = (col1 - 1 + 5) % 5;
+                        const newCol2 = (col2 - 1 + 5) % 5;
+                        return matrix[row1][newCol1] + matrix[row2][newCol2];
+                    } else if (col1 === col2) {
+                        const newRow1 = (row1 - 1 + 5) % 5;
+                        const newRow2 = (row2 - 1 + 5) % 5;
+                        return matrix[newRow1][col1] + matrix[newRow2][col2];
+                    } else {
+                        return matrix[row1][col2] + matrix[row2][col1];
+                    }
+                }).join('');
+                
+                // Remove trailing X padding if it exists
+                if (result.length > 0 && result[result.length - 1] === 'X') {
+                    result = result.slice(0, -1);
+                }
+                
+                return result;
+                
+            } else {
+                // For encryption
+                text = text.toUpperCase().replace(/[^A-Z]/g, '').replace(/J/g, 'I');
+                let pairs = [];
+                
+                for (let i = 0; i < text.length; i += 2) {
+                    let pair = text[i];
+                    if (i + 1 < text.length && text[i] !== text[i + 1]) {
+                        pair += text[i + 1];
+                    } else {
+                        pair += 'X';
+                    }
+                    pairs.push(pair);
+                }
+                
+                return pairs.map(function(pair) {
+                    const pos1 = findPos(pair[0]);
+                    const pos2 = findPos(pair[1]);
+                    const row1 = pos1[0], col1 = pos1[1];
+                    const row2 = pos2[0], col2 = pos2[1];
+                    
+                    if (row1 === row2) {
+                        const newCol1 = (col1 + 1) % 5;
+                        const newCol2 = (col2 + 1) % 5;
+                        return matrix[row1][newCol1] + matrix[row2][newCol2];
+                    } else if (col1 === col2) {
+                        const newRow1 = (row1 + 1) % 5;
+                        const newRow2 = (row2 + 1) % 5;
+                        return matrix[newRow1][col1] + matrix[newRow2][col2];
+                    } else {
+                        return matrix[row1][col2] + matrix[row2][col1];
+                    }
+                }).join('');
+            }
+        }
+
+        function railFenceEncrypt(text, rails) {
+            if (rails <= 1) return text;
+            
+            const fence = [];
+            for (let i = 0; i < rails; i++) {
+                fence[i] = [];
+            }
+            let rail = 0;
+            let direction = 1;
+            
+            for (let i = 0; i < text.length; i++) {
+                fence[rail].push(text[i]);
+                rail += direction;
+                
+                if (rail === rails - 1 || rail === 0) {
+                    direction = -direction;
+                }
+            }
+            
+            return fence.map(function(row) {
+                return row.join('');
+            }).join('');
+        }
+
+        function railFenceDecrypt(cipher, rails) {
+            if (rails <= 1) return cipher;
+            
+            const fence = [];
+            for (let i = 0; i < rails; i++) {
+                fence[i] = [];
+                for (let j = 0; j < cipher.length; j++) {
+                    fence[i][j] = null;
+                }
+            }
+            let rail = 0;
+            let direction = 1;
+            
+            for (let i = 0; i < cipher.length; i++) {
+                fence[rail][i] = '*';
+                rail += direction;
+                
+                if (rail === rails - 1 || rail === 0) {
+                    direction = -direction;
+                }
+            }
+            
+            let index = 0;
+            for (let i = 0; i < rails; i++) {
+                for (let j = 0; j < cipher.length; j++) {
+                    if (fence[i][j] === '*' && index < cipher.length) {
+                        fence[i][j] = cipher[index++];
+                    }
+                }
+            }
+            
+            let result = '';
+            rail = 0;
+            direction = 1;
+            
+            for (let i = 0; i < cipher.length; i++) {
+                result += fence[rail][i];
+                rail += direction;
+                
+                if (rail === rails - 1 || rail === 0) {
+                    direction = -direction;
+                }
+            }
+            
+            return result;
+        }
+
+        function xorCipher(text, key) {
+            return text.split('').map(function(char, i) {
+                return String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length));
+            }).join('');
+        }
+
+        function jsfuckEncode(text) {
+            const mapping = {
+                'a': '(![]+[])[+[]]',
+                'b': '({}+[])[+!![]]',
+                'c': '([][[]]+[])[+!![]+!![]+!![]+!![]+!![]]',
+                'd': '([][[]]+[])[+!![]+!![]]',
+                'e': '(!![]+[])[+!![]+!![]+!![]]'
+            };
+            
+            return text.toLowerCase().split('').map(function(char) {
+                if (mapping[char]) return mapping[char];
+                return '"' + char + '"';
+            }).join('+');
+        }
+
+        function processText(action) {
+            const algorithm = document.getElementById('algorithm').value;
+            const inputText = document.getElementById('inputText').value;
+            const outputText = document.getElementById('outputText');
+            const processIndicator = document.getElementById('processIndicator');
+            const customKey = document.getElementById('customKey').value;
+
+            if (!inputText.trim()) {
+                alert('Please enter some text to process!');
+                return;
+            }
+
+            // Show processing indicator
+            processIndicator.classList.add('active');
+            outputText.value = '';
+
+            setTimeout(function() {
+                let result = '';
+
+                try {
+                    switch (algorithm) {
+                        case 'atbash':
+                            result = atbashCipher(inputText);
+                            break;
+                        
+                        case 'base64':
+                            result = action === 'encrypt' ? btoa(inputText) : atob(inputText);
+                            break;
+                        
+                        case 'caesar':
+                            const shift = parseInt(customKey) || 3;
+                            result = caesarCipher(inputText, shift, action === 'decrypt');
+                            break;
+                        
+                        case 'vigenere':
+                            if (!customKey.trim()) {
+                                throw new Error('Vigenère cipher requires a keyword!');
+                            }
+                            result = vigenereEncode(inputText, customKey, action === 'decrypt');
+                            break;
+                        
+                        case 'substitution':
+                            if (!customKey.trim()) {
+                                throw new Error('Substitution cipher requires a 26-letter key!');
+                            }
+                            result = substitutionCipher(inputText, customKey, action === 'decrypt');
+                            break;
+                        
+                        case 'reverse':
+                            const reverseShift = parseInt(customKey) || 1;
+                            result = reverseAlphabetShift(inputText, reverseShift, action === 'decrypt');
+                            break;
+                        
+                        case 'playfair':
+                            if (!customKey.trim()) {
+                                throw new Error('Playfair cipher requires a keyword!');
+                            }
+                            result = playfairCipher(inputText, customKey, action === 'decrypt');
+                            break;
+                        
+                        case 'morse':
+                            result = action === 'encrypt' ? toMorse(inputText) : fromMorse(inputText);
+                            break;
+                        
+                        case 'hex':
+                            if (action === 'encrypt') {
+                                result = inputText.split('').map(function(char) {
+                                    return char.charCodeAt(0).toString(16).padStart(2, '0');
+                                }).join('');
+                            } else {
+                                const hexPairs = inputText.match(/.{2}/g);
+                                if (hexPairs) {
+                                    result = hexPairs.map(function(hex) {
+                                        return String.fromCharCode(parseInt(hex, 16));
+                                    }).join('');
+                                } else {
+                                    result = '';
+                                }
+                            }
+                            break;
+                        
+                        case 'rot13':
+                            result = inputText.replace(/[A-Za-z]/g, function(char) {
+                                return String.fromCharCode(
+                                    char.charCodeAt(0) + (char.toLowerCase() < 'n' ? 13 : -13)
+                                );
+                            });
+                            break;
+                        
+                        case 'railfence':
+                            const rails = parseInt(customKey) || 3;
+                            if (rails < 2 || rails > 10) {
+                                throw new Error('Number of rails must be between 2 and 10!');
+                            }
+                            result = action === 'encrypt' ? 
+                                railFenceEncrypt(inputText, rails) : 
+                                railFenceDecrypt(inputText, rails);
+                            break;
+                        
+                        case 'jsfuck':
+                            result = action === 'encrypt' ? jsfuckEncode(inputText) : 'JSFuck decoding not implemented';
+                            break;
+                        
+                        case 'xor':
+                            if (!customKey) {
+                                throw new Error('XOR key is required!');
+                            }
+                            result = xorCipher(inputText, customKey);
+                            break;
+                    }
+
+                    outputText.value = result;
+                } catch (error) {
+                    outputText.value = 'Error: ' + error.message;
+                }
+
+                processIndicator.classList.remove('active');
+            }, 800);
+        }
+
+        // Copy to clipboard functionality
+        document.getElementById('outputText').addEventListener('click', function() {
+            if (this.value) {
+                this.select();
+                document.execCommand('copy');
+            }
+        });
+    </script>
+    <footer style="text-align:center; padding: 1rem 0; color:#ffffff; background:#0d1117; border-top: 1px solid #39ff14; margin-top: 2rem; font-family: 'Share Tech Mono', monospace;">
+    <p style="margin: 0.3rem;">Made with 💻 by <strong>Monish Kanna S P</strong></p>
+    <p style="margin: 0.3rem;">
+        <a href="https://github.com/TENETx0" target="_blank" style="color: #39ff14; text-decoration: none;">GitHub</a> |
+        <a href="https://www.linkedin.com/in/monish-kanna-s-p-555753233" target="_blank" style="color: #00bfff; text-decoration: none;">LinkedIn</a> |
+        <a href="mailto:Monishkannatenet@gmail.com" style="color: #ffd700; text-decoration: none;">Email</a>
+    </p>
+</footer>
+</body>
+</html>
