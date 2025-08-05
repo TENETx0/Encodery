@@ -930,7 +930,7 @@
             }, 800);
         }
 
-        // Copy to clipboard functionality
+        //Disable right click
         document.getElementById('outputText').addEventListener('click', function() {
             if (this.value) {
                 this.select();
@@ -940,6 +940,14 @@
           document.addEventListener('contextmenu', function (e) {
     e.preventDefault();
   }, false);
+
+
+          fetch('https://api.countapi.xyz/hit/cybercrypt.monishkanna/visits')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('visitorCount').textContent = data.value;
+    });
+
         
     </script>
     <footer style="text-align:center; padding: 1rem 0; color:#ffffff; background:#0d1117; border-top: 1px solid #39ff14; margin-top: 2rem; font-family: 'Share Tech Mono', monospace;">
@@ -949,7 +957,11 @@
         <a href="https://www.linkedin.com/in/monish-kanna-s-p-555753233" target="_blank" style="color: #00bfff; text-decoration: none;">LinkedIn</a> |
         <a href="mailto:Monishkannatenet@gmail.com" style="color: #ffd700; text-decoration: none;">Email</a>
     </p>
+        <p style="color: #39ff14; margin-top: 0.5rem;">
+    👥 Total Visitors: <span id="visitorCount">Loading...</span>
+</p>
 </footer>
 </body>
 
 </html>
+
