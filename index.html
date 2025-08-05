@@ -270,6 +270,13 @@
             resize: vertical;
             transition: all 0.3s ease;
             line-height: 1.5;
+            user-select: text !important;
+    -webkit-user-select: text !important; /* Safari/Android */
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+
+    pointer-events: auto !important;
+    touch-action: manipulation;
         }
 
         textarea:focus {
@@ -952,7 +959,13 @@
     .then(data => {
       document.getElementById('visitorCount').textContent = data.value;
     });
-
+//right click on android
+  document.addEventListener('contextmenu', function (e) {
+    // Allow right-click on input or textarea
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+  }, false);
         
     </script>
     <footer style="text-align:center; padding: 1rem 0; color:#ffffff; background:#0d1117; border-top: 1px solid #39ff14; margin-top: 2rem; font-family: 'Share Tech Mono', monospace;">
@@ -969,5 +982,6 @@
 </body>
 
 </html>
+
 
 
